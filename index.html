@@ -1,0 +1,20 @@
+<html>
+<head>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+	<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="jquery.ui.rotatable.js"></script>
+	<link rel="stylesheet" href="jquery.ui.rotatable.css">
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+      $('#target3').resizable({aspectRatio: $('#target3').width()/$('#target3').height()}).rotatable(); $('#draggable3').draggable();
+		});
+	</script>
+</head>
+<body>
+  <div id="draggable3">
+    <div id="target3" style="width: 411px; height:213px; background:url(2.png) no-repeat; background-size:100%;"></div>
+  </div>
+</body>
+</html>
