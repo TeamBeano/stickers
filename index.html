@@ -7,31 +7,53 @@
 	<script src="jquery.ui.rotatable.js"></script>
 	<link rel="stylesheet" href="jquery.ui.rotatable.css">
 
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
+
 	<script type="text/javascript">
 		$(document).ready(function() {
-      $('#target3').resizable({aspectRatio: $('#target3').width()/$('#target3').height()}).rotatable(); $('#draggable3').draggable();
+      // $('#target3').resizable({aspectRatio: 266/392, handle: 'rect'}).rotatable();
+      $('#draggable3').draggable()
+        .bind('mousedown', function(event, ui){
+          // bring target to front
+          $(event.target.parentElement).append( event.target );
+        })
+        .bind('drag', function(event, ui){
+          event.target.setAttribute('x', ui.position.left);
+          event.target.setAttribute('y', ui.position.top);
+        });
+      $('.save').on('click', function() {
+        var svg  = document.getElementById('graph'),
+            xml  = new XMLSerializer().serializeToString(svg)
+        canvg(document.getElementById('canvas'), xml, {renderCallback: function functionName() {
+          var link = document.createElement("a");
+          link.download = 'your-picture.png';
+          link.href = document.getElementById('canvas').toDataURL();
+          link.click();
+        }})
+      })
 		});
 	</script>
   <style media="screen">
-    .picture{
-      width: 600px;
-      height: 600px;
-      position: relative;
+    body{
+      margin: 0;
+      padding: 0;
     }
-    img{max-width: 100%}
-    .background{
-      position: absolute;
+    #target3{
+      background: #ff0000;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-  <div class="picture">
-    <img src="pic.jpg" class='background' />
-    <div id="draggable3">
-      <div id="target3" style="width: 266px; height:392px;">
-        <img src="23.png" alt="" />
-      </div>
-    </div>
-  </div>
+  <svg id='graph' height="784px" width="532px" xmlns="http://www.w3.org/2000/svg">
+    <image xlink:href="http://localhost:8000/pic.jpg" height="784px" width="532px"/>
+    <svg id="draggable3" height="392px" width="266px" >
+  	  <image xlink:href="http://localhost:8000/23.png" height="392px" width="266px"/>
+    </svg>
+  </svg>
+  <a href="#" class='save'>Save</a>
+  <canvas id="canvas" width="1000px" height="600px" style='display:none;'></canvas>
 </body>
 </html>
