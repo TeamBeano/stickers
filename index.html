@@ -1,37 +1,74 @@
 <html>
 <head>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-	<script src="http://code.jquery.com/jquery-1.11.3.js"></script>
-	<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <script src="jquery.ui.touch-punch.js"></script>
-	<script src="jquery.ui.rotatable.js"></script>
-	<link rel="stylesheet" href="jquery.ui.rotatable.css">
+	<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
 
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
 
+	<script src="https://cdn.rawgit.com/hammerjs/touchemulator/master/touch-emulator.js"></script>
+	<script> TouchEmulator(); </script>
+	<script src="http://hammerjs.github.io/dist/hammer.js"></script>
+
 	<script type="text/javascript">
 		$(document).ready(function() {
-      // $('#target3').resizable({aspectRatio: 266/392, handle: 'rect'}).rotatable();
-      $('#draggable3').draggable()
-        .bind('mousedown', function(event, ui){
-          // bring target to front
-          $(event.target.parentElement).append( event.target );
-        })
-        .bind('drag', function(event, ui){
-          event.target.setAttribute('x', ui.position.left);
-          event.target.setAttribute('y', ui.position.top);
-        });
+
+			// get a reference to an element
+			var stage = document.getElementById('draggable');
+			$stage = jQuery(stage);
+
+			// create a manager for that element
+			var manager = new Hammer.Manager(stage);
+
+			// create recognizers
+			var Pan = new Hammer.Pan();
+			var Rotate = new Hammer.Rotate();
+			var Pinch = new Hammer.Pinch();
+
+			// use them together
+			Rotate.recognizeWith([Pan]);
+			Pinch.recognizeWith([Rotate, Pan]);
+
+			// add the recognizers
+			manager.add(Pan);
+			manager.add(Rotate);
+			manager.add(Pinch);
+
+			var posX=0,
+				posY=0,
+				scale=1,
+				rotation= 0;
+
+			var currentRotation = 0;
+			manager.on('rotatemove', function(e) {
+			  rotation = currentRotation + Math.round(scale * e.rotation);
+			});
+
+			manager.on('panmove', function(e) {
+				posX=e.deltaX
+				posY=e.deltaY
+			});
+
+			var currentScale = 1;
+			function getRelativeScale(scale) {
+			  return scale * currentScale;
+			}
+			manager.on('pinchmove', function(e) {
+			  scale = e.scale
+			});
+
+			manager.on('panmove pinchmove rotatemove', function(ev) {
+				stage.setAttribute('transform', 'translate('+posX+','+posY+') rotate('+rotation+', 133, 196) scale('+scale+')')
+	    });
+
       $('.save').on('click', function() {
-        var svg  = document.getElementById('graph'),
-            xml  = new XMLSerializer().serializeToString(svg)
+        var xml  = new XMLSerializer().serializeToString(document.getElementById('graph'))
         canvg(document.getElementById('canvas'), xml, {renderCallback: function functionName() {
           var link = document.createElement("a");
           link.download = 'your-picture.png';
           link.href = document.getElementById('canvas').toDataURL();
           link.click();
-        }})
+        }});
       })
 		});
 	</script>
@@ -40,18 +77,12 @@
       margin: 0;
       padding: 0;
     }
-    #target3{
-      background: #ff0000;
-      opacity: 0.5;
-    }
   </style>
 </head>
 <body>
   <svg id='graph' height="784px" width="532px" xmlns="http://www.w3.org/2000/svg">
     <image xlink:href="pic.jpg" height="784px" width="532px"/>
-    <svg id="draggable3" height="392px" width="266px" >
-  	  <image xlink:href="23.png" height="392px" width="266px"/>
-    </svg>
+  	<image id="draggable" xlink:href="23.png" height="392px" width="266px" />
   </svg>
   <a href="#" class='save'>Save</a>
   <canvas id="canvas" width="1000px" height="600px" style='display:none;'></canvas>
