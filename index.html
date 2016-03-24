@@ -44,15 +44,17 @@
 			  rotation = currentRotation + Math.round(scale * e.rotation);
 			});
 
+			var deltaX = 0;
+			var deltaY = 0;
 			manager.on('panmove', function(e) {
-				posX=e.deltaX
-				posY=e.deltaY
+				posX = deltaX + (e.deltaX);
+				posY = deltaY + (e.deltaY);
+			});
+			manager.on('panend', function(e) {
+				deltaX = deltaX + e.deltaX;
+				deltaY = deltaY + e.deltaY;
 			});
 
-			var currentScale = 1;
-			function getRelativeScale(scale) {
-			  return scale * currentScale;
-			}
 			manager.on('pinchmove', function(e) {
 			  scale = e.scale
 			});
@@ -76,6 +78,9 @@
     body{
       margin: 0;
       padding: 0;
+    }
+		#draggable {
+        cursor: move;
     }
   </style>
 </head>
