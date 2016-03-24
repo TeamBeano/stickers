@@ -39,9 +39,13 @@
 				scale=1,
 				rotation= 0;
 
+			var liveScale = 1;
 			var currentRotation = 0;
+			manager.on('rotatestart', function(e) {
+				currentRotation = e.rotation
+			});
 			manager.on('rotatemove', function(e) {
-			  rotation = currentRotation + Math.round(scale * e.rotation);
+				rotation = Math.round(liveScale * e.rotation) - currentRotation;
 			});
 
 			var deltaX = 0;
@@ -55,12 +59,20 @@
 				deltaY = deltaY + e.deltaY;
 			});
 
+			var currentScale = 1;
+			function getRelativeScale(scale) {
+				return scale * currentScale;
+			}
 			manager.on('pinchmove', function(e) {
-			  scale = e.scale
+				scale = getRelativeScale(e.scale);
+			});
+			manager.on('pinchend', function(e) {
+				currentScale = getRelativeScale(e.scale);
+				liveScale = currentScale;
 			});
 
 			manager.on('panmove pinchmove rotatemove', function(ev) {
-				stage.setAttribute('transform', 'translate('+posX+','+posY+') rotate('+rotation+', 133, 196) scale('+scale+')')
+				stage.setAttribute('transform', 'translate('+posX+','+posY+') rotate('+rotation+', '+(stage.width.animVal.value/2)*scale+', '+(stage.height.animVal.value/2)*scale+') scale('+scale+')')
 	    });
 
       $('.save').on('click', function() {
@@ -81,6 +93,7 @@
     }
 		#draggable {
         cursor: move;
+				transform-origin: center;
     }
   </style>
 </head>
