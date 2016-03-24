@@ -5,7 +5,6 @@
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
   <script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
-
 	<script src="https://cdn.rawgit.com/hammerjs/touchemulator/master/touch-emulator.js"></script>
 	<script> TouchEmulator(); </script>
 	<script src="http://hammerjs.github.io/dist/hammer.js"></script>
@@ -13,66 +12,68 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-			// get a reference to an element
-			var stage = document.getElementById('draggable');
-			$stage = jQuery(stage);
+			function HammerTime() {
+				// get a reference to an element
+				var stage = document.getElementById('draggable');
+				$stage = jQuery(stage);
 
-			// create a manager for that element
-			var manager = new Hammer.Manager(stage);
+				// create a manager for that element
+				var manager = new Hammer.Manager(stage);
 
-			// create recognizers
-			var Pan = new Hammer.Pan();
-			var Rotate = new Hammer.Rotate();
-			var Pinch = new Hammer.Pinch();
+				// create recognizers
+				var Pan = new Hammer.Pan();
+				var Rotate = new Hammer.Rotate();
+				var Pinch = new Hammer.Pinch();
 
-			// add the recognizers
-			manager.add(Pan);
-			manager.add(Rotate);
-			manager.add(Pinch);
+				// add the recognizers
+				manager.add(Pan);
+				manager.add(Rotate);
+				manager.add(Pinch);
 
-			manager.add(new Hammer.Rotate({ threshold: 0 })).recognizeWith(manager.get('pan'));
-			manager.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith([manager.get('pan'), manager.get('rotate')]);
+				manager.add(new Hammer.Rotate({ threshold: 0 })).recognizeWith(manager.get('pan'));
+				manager.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith([manager.get('pan'), manager.get('rotate')]);
 
-			var posX=0,
-				posY=0,
-				scale=1,
-				rotation= 0;
+				var posX=0,
+					posY=0,
+					scale=1,
+					rotation= 0;
 
-			var liveScale = 1;
-			var currentRotation = 0;
-			manager.on('rotatestart', function(e) {
-				currentRotation = e.rotation
-			});
-			manager.on('rotatemove', function(e) {
-				rotation = Math.round(liveScale * e.rotation) - currentRotation;
-			});
+				var liveScale = 1;
+				var currentRotation = 0;
+				manager.on('rotatestart', function(e) {
+					currentRotation = e.rotation
+				});
+				manager.on('rotatemove', function(e) {
+					rotation = Math.round(liveScale * e.rotation) - currentRotation;
+				});
 
-			var deltaX = 0;
-			var deltaY = 0;
-			manager.on('panmove', function(e) {
-				posX = deltaX + (e.deltaX);
-				posY = deltaY + (e.deltaY);
-			});
-			manager.on('panend', function(e) {
-				deltaX = deltaX + e.deltaX;
-				deltaY = deltaY + e.deltaY;
-			});
+				var deltaX = 0;
+				var deltaY = 0;
+				manager.on('panmove', function(e) {
+					posX = deltaX + (e.deltaX);
+					posY = deltaY + (e.deltaY);
+				});
+				manager.on('panend', function(e) {
+					deltaX = deltaX + e.deltaX;
+					deltaY = deltaY + e.deltaY;
+				});
 
-			var currentScale = 1;
-			function getRelativeScale(scale) {
-				return scale * currentScale;
+				var currentScale = 1;
+				function getRelativeScale(scale) {
+					return scale * currentScale;
+				}
+				manager.on('pinchmove', function(e) {
+					scale = getRelativeScale(e.scale);
+				});
+				manager.on('pinchend', function(e) {
+					currentScale = getRelativeScale(e.scale);
+					liveScale = currentScale;
+				});
+
+				manager.on('panmove pinchmove rotatemove', function(ev) {
+					stage.setAttribute('transform', 'translate('+posX+','+posY+') rotate('+rotation+', '+(stage.width.animVal.value/2)*scale+', '+(stage.height.animVal.value/2)*scale+') scale('+scale+')')
+				});
 			}
-			manager.on('pinchmove', function(e) {
-				scale = getRelativeScale(e.scale);
-			});
-			manager.on('pinchend', function(e) {
-				currentScale = getRelativeScale(e.scale);
-				liveScale = currentScale;
-			});
-
-			manager.on('panmove pinchmove rotatemove', function(ev) {
-				stage.setAttribute('transform', 'translate('+posX+','+posY+') rotate('+rotation+', '+(stage.width.animVal.value/2)*scale+', '+(stage.height.animVal.value/2)*scale+') scale('+scale+')')
-	    });
 
       $('.save').on('click', function() {
         var xml  = new XMLSerializer().serializeToString(document.getElementById('graph'))
@@ -83,6 +84,14 @@
           link.click();
         }});
       })
+
+			$('.badge').on('click', function() {
+				elm = $(this)
+				$('#draggable').remove()
+				image = $('<svg><image id="draggable" xlink:href="'+elm.data().path+'" height="'+elm.data().height+'px" width="'+elm.data().width+'px" /></svg>').find('image')[0]
+				document.getElementById('graph').appendChild(image)
+				HammerTime()
+			})
 		});
 	</script>
   <style media="screen">
@@ -94,6 +103,27 @@
         cursor: move;
 				transform-origin: center;
     }
+		.badges{
+			display: table;
+			height: 100px;
+
+		}
+		.badge{
+			width: 100px;
+			height: 100px;
+			float: left;
+			vertical-align: middle;
+			text-align: center;
+			border: 1px solid #eee;
+			display: table-cell;
+		}
+		.badge img{
+			max-width: 100%;
+			max-height: 100%;
+		}
+		p{
+			clear:both;
+		}
   </style>
 </head>
 <body>
@@ -101,7 +131,18 @@
     <image xlink:href="pic.jpg" height="784px" width="532px"/>
   	<image id="draggable" xlink:href="23.png" height="392px" width="266px" />
   </svg>
-  <a href="#" class='save'>Save</a>
+	<div class="badges">
+		<div class="badge" data-width="411" data-height="213" data-path="2.png">
+			<img src="2.png" alt="" />
+		</div>
+		<div class="badge" data-width="392" data-height="266" data-path="23.png">
+			<img src="23.png" alt="" />
+		</div>
+	</div>
+
+  <p>
+  	<a href="#" class='save'>Save</a>
+  </p>
   <canvas id="canvas" width="1000px" height="600px" style='display:none;'></canvas>
 </body>
 </html>
