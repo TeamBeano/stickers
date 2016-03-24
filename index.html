@@ -26,8 +26,8 @@
 			var Pinch = new Hammer.Pinch();
 
 			// use them together
-			Rotate.recognizeWith([Pan]);
-			Pinch.recognizeWith([Rotate, Pan]);
+			Rotate.recognizeWith([Pan, Pinch]);
+			// Pinch.recognizeWith([Rotate, Pan]);
 
 			// add the recognizers
 			manager.add(Pan);
