@@ -88,9 +88,10 @@
 			$('.badge').on('click', function() {
 				elm = $(this)
 				$('#draggable').remove()
-				image = $('<svg><image id="draggable" xlink:href="'+elm.data().path+'" height="'+elm.data().height+'px" width="'+elm.data().width+'px" /></svg>').find('image')[0]
+				image = $('<svg><image id="draggable" xlink:href="'+elm.data().path+'" height="300px" width="300px" /></svg>').find('image')[0]
 				document.getElementById('graph').appendChild(image)
 				HammerTime()
+				$('.save').show()
 			})
 
 			$('#badgeupload').on('change', function(event) {
@@ -102,9 +103,9 @@
 					$('#background').remove()
 					image = $('<svg><image id="background" xlink:href="'+dataURL+'" height="1000px" width="1000px" /></svg>').find('image')[0]
 					document.getElementById('graph').appendChild(image)
+					$('.badges').show()
 				};
 				reader.readAsDataURL(input.files[0]);
-
 			})
 		});
 	</script>
@@ -120,20 +121,21 @@
 		.badges{
 			display: table;
 			height: 100px;
-
+			width: 1000px;
+			overflow-x: scroll;
 		}
 		.badge{
 			width: 100px;
 			height: 100px;
-			float: left;
+
 			vertical-align: middle;
 			text-align: center;
-			border: 1px solid #eee;
 			display: table-cell;
 		}
-		.badge img{
-			max-width: 100%;
-			max-height: 100%;
+		.badge{
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center center;
 		}
 		p{
 			clear:both;
@@ -141,20 +143,27 @@
   </style>
 </head>
 <body>
-	<input id='badgeupload' type='file' accept='image/*'>
+	<p>
+		<input id='badgeupload' type='file' accept='image/*'>
+	</p>
   <svg id='graph' height="1000px" width="1000px" xmlns="http://www.w3.org/2000/svg">
   </svg>
-	<div class="badges">
-		<div class="badge" data-width="411" data-height="213" data-path="2.png">
-			<img src="2.png" alt="" />
-		</div>
-		<div class="badge" data-width="392" data-height="266" data-path="23.png">
-			<img src="23.png" alt="" />
-		</div>
+	<div class="badges" style='display:none;'>
+		<div class="badge" data-path="1.png" style="background-image:url(1.png)"></div>
+		<div class="badge" data-path="2.png" style="background-image:url(2.png)"></div>
+		<div class="badge" data-path="3.png" style="background-image:url(3.png)"></div>
+		<div class="badge" data-path="4.png" style="background-image:url(4.png)"></div>
+		<div class="badge" data-path="5.png" style="background-image:url(5.png)"></div>
+		<div class="badge" data-path="6.png" style="background-image:url(6.png)"></div>
+		<div class="badge" data-path="7.png" style="background-image:url(7.png)"></div>
+		<div class="badge" data-path="8.png" style="background-image:url(8.png)"></div>
+		<div class="badge" data-path="9.png" style="background-image:url(9.png)"></div>
+		<div class="badge" data-path="10.png"  style="background-image:url(10.png)"></div>
+		<div class="badge" data-path="23.png" style="background-image:url(23.png)"></div>
 	</div>
 
   <p>
-  	<a href="#" class='save'>Save</a>
+  	<a href="#" class='save' style='display:none;'>Save</a>
   </p>
   <canvas id="canvas" width="1000px" height="600px" style='display:none;'></canvas>
 </body>
