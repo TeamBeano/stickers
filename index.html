@@ -92,6 +92,20 @@
 				document.getElementById('graph').appendChild(image)
 				HammerTime()
 			})
+
+			$('#badgeupload').on('change', function(event) {
+				var input = event.target;
+
+				var reader = new FileReader();
+				reader.onload = function(){
+					var dataURL = reader.result;
+					$('#background').remove()
+					image = $('<svg><image id="background" xlink:href="'+dataURL+'" height="1000px" width="1000px" /></svg>').find('image')[0]
+					document.getElementById('graph').appendChild(image)
+				};
+				reader.readAsDataURL(input.files[0]);
+
+			})
 		});
 	</script>
   <style media="screen">
@@ -127,8 +141,8 @@
   </style>
 </head>
 <body>
-  <svg id='graph' height="784px" width="532px" xmlns="http://www.w3.org/2000/svg">
-    <image xlink:href="pic.jpg" height="784px" width="532px"/>
+	<input id='badgeupload' type='file' accept='image/*'>
+  <svg id='graph' height="1000px" width="1000px" xmlns="http://www.w3.org/2000/svg">
   </svg>
 	<div class="badges">
 		<div class="badge" data-width="411" data-height="213" data-path="2.png">
